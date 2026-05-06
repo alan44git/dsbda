@@ -21,9 +21,9 @@ public class LogAnalysis {
                 throws IOException, InterruptedException {
 
             try {
-                String[] fields = value.toString().split("\\t");
+                String[] fields = value.toString().split(",");
 
-                String mac = fields[0];
+                String mac = fields[1];
                 String loginTime = fields[5];
                 String logoutTime = fields[7];
 
