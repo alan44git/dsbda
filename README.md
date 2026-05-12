@@ -261,21 +261,21 @@ This repository contains all problem statements for the **Distributed Systems an
 
 ## Web Scraping Applications (PS 27-30)
 
-### PS 27: Amazon Review Scraper
+### PS 27: Steam Review Scraper
 **Objective:** Create a review scrapper for https://store.steampowered.com/appreviews 
 /730?json=1  website to fetch real time comments, reviews, ratings, comment 
 tags, customer name using Python. 
 
-### PS 28: Flipkart Review Scraper
+### PS 28: Webscraper io Scraper
 **Objective:** Create a review scrapper for https://webscraper.io/test-sites/e-commerce 
 /static website to fetch real time comments, reviews, ratings, comment tags, 
 customer name using Python. 
 
-### PS 29: Myntra Review Scraper
+### PS 29: PICT Review Scraper
 **Objective:** Create a review scrapper for PICT-Top Engineering College website to fetch real 
 time comments, reviews, ratings, comment tags, customer name using Python.
 
-### PS 30: AJIO Review Scraper
+### PS 30: Bookstoscrape Review Scraper
 **Objective:** Create a review scrapper for books.toscrape.com website to fetch real time 
 comments, reviews, ratings, comment tags, customer name using Python.
 
