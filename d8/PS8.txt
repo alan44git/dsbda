@@ -1,0 +1,122 @@
+CREATE DATABASE OnlineRetail;
+USE OnlineRetail;
+
+//create table
+CREATE TABLE online_retail(
+invoice_no STRING,
+stock_code STRING,
+description STRING,
+quantity INT,
+invoice_date STRING,
+unit_price DOUBLE,
+cust_id STRING,
+country STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ',';
+--------------------------
+//LOAD DATA
+LOAD DATA INPATH 'OnlineStore/OnlineRetail.csv'
+INTO TABLE online_retail;
+
+//check
+select * from online_retail LIMIT 5;
+-------------------------------------------
+//before creating index make another table bcoz dataset has 500k+ rows 
+(you can do without creating small table it will take 1-2 min);
+
+CREATE TABLE retail_small AS
+SELECT *
+FROM online_retail
+LIMIT 1000;
+
+//index
+//1.create index
+CREATE INDEX retail_index
+ON TABLE retail_small (cust_id)
+AS 'COMPACT'
+WITH DEFERRED REBUILD;
+
+//2.build index
+ALTER INDEX retail_index
+ON retail_small
+REBUILD;
+
+//3.show index
+SHOW INDEX ON retail_small;
+-----------------------------------------
+//FIND AVG/TOTAL
+SELECT SUM(quantity*unit_price) AS total_sales
+FROM online_retail
+LIMIT 5;
+------------------------------------------------
+//find order details with max cost
+//NOTE: here we do not use SUM bcoz we have to find single order details with max cost**
+
+SELECT *,(quantity*unit_price) AS total_cost
+FROM online_retail
+ORDER BY total_cost DESC
+LIMIT 1;
+
+---------------------------------------------------
+//Find Customer details with maximum order total. 
+SELECT cust_id,SUM(quantity*unit_price) AS total_purchase
+FROM retail_small
+GROUP BY cust_id
+ORDER BY total_purchase DESC
+LIMIT 1;
+---------------------------------------------------------------------
+Find Country with Maximum Sale
+
+SELECT
+country,
+SUM(quantity * unit_price) AS total_sales
+FROM online_retail
+GROUP BY country
+ORDER BY total_sales DESC
+LIMIT 1;
+----------------------------------------------------------------
+Find Country with Minimum Sale
+
+SELECT
+country,
+SUM(quantity * unit_price) AS total_sales
+FROM online_retail
+GROUP BY country
+ORDER BY total_sales ASC
+LIMIT 1;
+
+--------------------------------------------------------------------
+Creating an external Hive table to connect to the HBase for OnlineRetail
+
+//FIRST GO IN HBASE
+1.hbase shell
+2.create 'retail_hbase','retail_details'
+3.//INSERT DATA
+ put 'retail_hbase','S101','retail_details:description','desc1'
+ put 'retail_hbase','S101','retail_details:customer','cust1'
+ put 'retail_hbase','S101','retail_details:country','c1'
+
+//CHECK
+scan 'retail_hbase'
+ 
+
+//NOW GO IN HIVE
+
+CREATE EXTERNAL TABLE online_hive(
+stock_code STRING,
+description STRING,
+cust_id STRING,
+country STRING
+)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES(
+"hbase.columns.mapping"=":key,retail_details:description,retail_details:customer,retail_details:country"
+)
+TBLPROPERTIES(
+"hbase.table.name"="retail_hbase"
+);
+
+
+//CHECK
+SELECT * FROM online_hive;
